@@ -1,0 +1,82 @@
+version: '3.1'
+
+services:
+
+  nginx:
+    image: "nginx:${NGINX_VERSION}-alpine"
+    # TLS 1.3
+    # image: "metowolf/nginx:${NGINX_VERSION}-alpine"
+    ports:
+      - 80:80
+      - 443:443/tcp
+    depends_on:
+      - php-fpm
+    volumes:
+      - ./nginx/logs:/var/log/nginx:rw
+      - ./nginx/config:/etc/nginx/conf.d:rw
+      - ./nginx/ssl:/etc/nginx/ssl:rw
+      - ./wwwroot:/var/www:rw
+    networks:
+      - frontend
+      - backend
+
+  caddy:
+    image: "abiosoft/caddy:${CADDY_VERSION}"
+    command: ["sh", "-c", "/start.sh & /usr/bin/caddy -conf /etc/caddy/Caddyfile -agree -quic"]
+    ports:
+      - 443:443/udp
+    depends_on:
+      - nginx
+    restart: always
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:rw
+      - ./nginx/ssl:/ssl:rw
+    networks:
+      - frontend
+      - backend
+
+  php-fpm:
+    image: "metowolf/php:${PHP_VERSION}-fpm-alpine"
+    restart: always
+    volumes:
+      - ./wwwroot:/var/www:rw
+    networks:
+      - backend
+
+  mysql:
+    image: "mysql:${MYSQL_VERSION}"
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./database/config:/etc/mysql/conf.d:rw
+      - ./database/data:/var/lib/mysql:rw
+    networks:
+      - backend
+
+  phpmyadmin:
+    image: "phpmyadmin/phpmyadmin:${PMA_VERSION}"
+    restart: always
+    environment:
+      PMA_HOST: mysql
+    depends_on:
+      - mysql
+    networks:
+      - frontend
+      - backend
+
+  redis:
+    image: "redis:${REDIS_VERSION}-alpine"
+    restart: always
+    volumes:
+      - ./redis/data:/data:rw
+    networks:
+      - backend
+
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge

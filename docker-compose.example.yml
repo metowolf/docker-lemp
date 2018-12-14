@@ -16,6 +16,9 @@ services:
       - ./nginx/config:/etc/nginx/conf.d:rw
       - ./nginx/ssl:/etc/nginx/ssl:rw
       - ./wwwroot:/var/www:rw
+    environment:
+      TZ: ${TZ}
+    restart: always
     networks:
       - frontend
       - backend
@@ -27,51 +30,58 @@ services:
       - 443:443/udp
     depends_on:
       - nginx
-    restart: always
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:rw
       - ./nginx/ssl:/ssl:rw
+    environment:
+      TZ: ${TZ}
+    restart: always
     networks:
       - frontend
       - backend
 
   php-fpm:
     image: "metowolf/php:${PHP_VERSION}-fpm-alpine"
-    restart: always
     volumes:
       - ./wwwroot:/var/www:rw
       - ./crontab:/etc/crontabs:rw
+    environment:
+      TZ: ${TZ}
+    restart: always
     networks:
       - backend
 
   mysql:
     image: "mysql:${MYSQL_VERSION}"
     command: --default-authentication-plugin=mysql_native_password
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - ./database/config:/etc/mysql/conf.d:rw
       - ./database/data:/var/lib/mysql:rw
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: ${TZ}
+    restart: always
     networks:
       - backend
 
   phpmyadmin:
     image: "phpmyadmin/phpmyadmin:${PMA_VERSION}"
-    restart: always
-    environment:
-      PMA_HOST: mysql
     depends_on:
       - mysql
+    environment:
+      PMA_HOST: mysql
+      TZ: ${TZ}
     networks:
       - frontend
       - backend
 
   redis:
     image: "redis:${REDIS_VERSION}-alpine"
-    restart: always
     volumes:
       - ./redis/data:/data:rw
+    environment:
+      TZ: ${TZ}
+    restart: always
     networks:
       - backend
 

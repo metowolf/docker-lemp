@@ -13,7 +13,7 @@ services:
       - php-fpm
     volumes:
       - ./log/nginx:/var/log/nginx:rw
-      - ./etc/nginx/conf.d:/etc/nginx/conf.d:rw
+      - ./etc/nginx/config:/etc/nginx/conf.d:rw
       - ./etc/ssl:/etc/nginx/ssl:rw
       - ./wwwroot:/var/www:rw
     environment:
@@ -25,14 +25,15 @@ services:
 
   caddy:
     image: "abiosoft/caddy:${CADDY_VERSION}"
-    command: ["sh", "-c", "/start.sh & /usr/bin/caddy -conf /etc/caddy/Caddyfile -agree -quic"]
+    entrypoint: /usr/bin/caddy
+    command: ["-conf", "/etc/caddy/Caddyfile", "-agree", "-quic"]
     ports:
       - 443:443/udp
     depends_on:
       - nginx
     volumes:
       - ./etc/caddy/Caddyfile:/etc/caddy/Caddyfile:rw
-      - ./ssl:/ssl:rw
+      - ./etc/ssl:/ssl:rw
     environment:
       TZ: ${TZ}
     restart: always

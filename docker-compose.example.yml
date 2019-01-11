@@ -12,9 +12,9 @@ services:
     depends_on:
       - php-fpm
     volumes:
-      - ./nginx/logs:/var/log/nginx:rw
-      - ./nginx/config:/etc/nginx/conf.d:rw
-      - ./nginx/ssl:/etc/nginx/ssl:rw
+      - ./log/nginx:/var/log/nginx:rw
+      - ./etc/nginx/conf.d:/etc/nginx/conf.d:rw
+      - ./etc/ssl:/etc/nginx/ssl:rw
       - ./wwwroot:/var/www:rw
     environment:
       TZ: ${TZ}
@@ -31,8 +31,8 @@ services:
     depends_on:
       - nginx
     volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:rw
-      - ./nginx/ssl:/ssl:rw
+      - ./etc/caddy/Caddyfile:/etc/caddy/Caddyfile:rw
+      - ./ssl:/ssl:rw
     environment:
       TZ: ${TZ}
     restart: always
@@ -44,7 +44,7 @@ services:
     image: "metowolf/php:${PHP_VERSION}-fpm-alpine"
     volumes:
       - ./wwwroot:/var/www:rw
-      - ./crontab:/etc/crontabs:rw
+      - ./etc/crontab:/etc/crontabs:rw
     environment:
       TZ: ${TZ}
     restart: always
@@ -55,8 +55,8 @@ services:
     image: "mysql:${MYSQL_VERSION}"
     command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - ./database/config:/etc/mysql/conf.d:rw
-      - ./database/data:/var/lib/mysql:rw
+      - ./data/database/config:/etc/mysql/conf.d:rw
+      - ./data/database/data:/var/lib/mysql:rw
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       TZ: ${TZ}
@@ -78,7 +78,7 @@ services:
   redis:
     image: "redis:${REDIS_VERSION}-alpine"
     volumes:
-      - ./redis/data:/data:rw
+      - ./data/redis/data:/data:rw
     environment:
       TZ: ${TZ}
     restart: always

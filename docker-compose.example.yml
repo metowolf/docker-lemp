@@ -58,7 +58,7 @@ services:
       - ./data/database/data:/var/lib/mysql:rw
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_ROOT_HOST: %
+      MYSQL_ROOT_HOST: "%"
       TZ: ${TZ}
     restart: always
     networks:

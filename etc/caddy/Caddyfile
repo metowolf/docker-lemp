@@ -1,9 +1,10 @@
-https://i-meto.com {
-
-    gzip
-    tls /ssl/i-meto.com.crt /ssl/i-meto.com.key
-
-    proxy / nginx {
-        transparent
-    }
+https://example.com {
+  gzip
+  #tls /ssl/example.crt /ssl/example.key
+  tls self_signed
+  proxy / https://nginx {
+    insecure_skip_verify
+    transparent
+    websocket
+  }
 }

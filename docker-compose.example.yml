@@ -45,6 +45,7 @@ services:
       - ./wwwroot:/var/www:rw
       - ./etc/crontab:/etc/crontabs:rw
     environment:
+      ENABLE_CRONTAB: "true"
       TZ: ${TZ}
     restart: always
     networks:

@@ -7,8 +7,6 @@ services:
     ports:
       - 80:80
       - 443:443/tcp
-    depends_on:
-      - php-fpm
     volumes:
       - ./log/nginx:/var/log/nginx:rw
       - ./etc/nginx/config:/etc/nginx/conf.d:rw
@@ -27,8 +25,6 @@ services:
     command: ["-conf", "/etc/caddy/Caddyfile", "-agree", "-quic"]
     ports:
       - 443:443/udp
-    depends_on:
-      - nginx
     volumes:
       - ./etc/caddy/Caddyfile:/etc/caddy/Caddyfile:rw
       - ./etc/ssl:/ssl:rw

@@ -13,6 +13,7 @@ services:
       - ./etc/ssl:/etc/nginx/ssl:rw
       - ./wwwroot:/var/www:rw
     environment:
+      ENABLE_CRONTAB: "true"
       TZ: ${TZ}
     restart: always
     networks:

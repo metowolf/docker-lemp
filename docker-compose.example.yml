@@ -52,7 +52,7 @@ services:
     image: "${MYSQL_VERSION}"
     command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - ./data/database/config:/etc/mysql/conf.d:rw
+      - ./data/database/config:/etc/my.cnf.d:rw
       - ./data/database/data:/var/lib/mysql:rw
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}

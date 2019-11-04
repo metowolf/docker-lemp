@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.2'
 
 services:
 
@@ -6,61 +6,45 @@ services:
     image: "${NGINX_VERSION}"
     ports:
       - 80:80
-      - 443:443/tcp
+      - 443:443
+      - 443:443/udp
     volumes:
-      - ./log/nginx:/var/log/nginx:rw
-      - ./etc/nginx/config:/etc/nginx/conf.d:rw
-      - ./etc/ssl:/etc/nginx/ssl:rw
-      - ./wwwroot:/var/www:rw
+      - ./log/nginx:/var/log/nginx
+      - ./etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./etc/nginx/conf.d:/etc/nginx/conf.d
+      - ./etc/nginx/ssl:/etc/nginx/ssl
+      - ./wwwroot:/var/www
     environment:
       ENABLE_CRONTAB: "true"
       TZ: ${TZ}
-    restart: always
-    networks:
-      - frontend
-      - backend
+    restart: on-failure
 
-  caddy:
-    image: "${CADDY_VERSION}"
-    entrypoint: /usr/bin/caddy
-    command: ["-conf", "/etc/caddy/Caddyfile", "-agree", "-quic"]
-    ports:
-      - 443:443/udp
-    volumes:
-      - ./etc/caddy/Caddyfile:/etc/caddy/Caddyfile:rw
-      - ./etc/ssl:/ssl:rw
-    environment:
-      TZ: ${TZ}
-    restart: always
-    networks:
-      - frontend
-      - backend
 
   php-fpm:
     image: "${PHP_VERSION}"
     volumes:
-      - ./wwwroot:/var/www:rw
-      - ./etc/crontab:/etc/crontabs:rw
+      - ./etc/php-fpm/php-fpm.ini:/usr/local/etc/php-fpm.ini
+      - ./etc/php-fpm/crontabs:/etc/crontabs
+      - ./wwwroot:/var/www
     environment:
       ENABLE_CRONTAB: "true"
       TZ: ${TZ}
-    restart: always
-    networks:
-      - backend
+    restart: on-failure
+
 
   mysql:
     image: "${MYSQL_VERSION}"
     command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - ./data/database/config:/etc/my.cnf.d:rw
-      - ./data/database/data:/var/lib/mysql:rw
+      - ./etc/mysql/my.cnf:/etc/my.cnf
+      - ./etc/mysql/my.cnf.d:/etc/my.cnf.d
+      - ./data/mysql/data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_ROOT_HOST: "%"
       TZ: ${TZ}
-    restart: always
-    networks:
-      - backend
+    restart: on-failure
+
 
   phpmyadmin:
     image: "${PMA_VERSION}"
@@ -71,9 +55,8 @@ services:
     environment:
       PMA_HOST: mysql
       TZ: ${TZ}
-    networks:
-      - frontend
-      - backend
+    restart: on-failure
+
 
   redis:
     image: "${REDIS_VERSION}"
@@ -81,13 +64,4 @@ services:
       - ./data/redis/data:/data:rw
     environment:
       TZ: ${TZ}
-    restart: always
-    networks:
-      - backend
-
-
-networks:
-  frontend:
-    driver: bridge
-  backend:
-    driver: bridge
+    restart: on-failure

@@ -65,12 +65,7 @@ http {
 
 ## Running `brotli`
 
- 1. Add the following lines into `nginx.conf` to load `brotli` module for your nginx server:
-```nginx
-load_module  modules/ngx_http_brotli_filter_module.so;
-load_module  modules/ngx_http_brotli_static_module.so;
-```
- 2. Add the following lines into the configuration file of your sites to enable `brotli` feature:
+ 1. Add the following lines into the configuration file of your sites to enable `brotli` feature:
 ```nginx
 brotli on;
 brotli_comp_level 6;
